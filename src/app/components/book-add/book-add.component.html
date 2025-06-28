@@ -1,0 +1,5 @@
+<form #f="ngForm" (ngSubmit)="onSubmit(f)">
+    <input name="title" ngModel placeholder="Title">
+    <textarea name="body" ngModel placeholder="Body"></textarea>
+    <button type="submit">Add Book</button>
+</form>

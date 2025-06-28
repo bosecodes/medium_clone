@@ -1,0 +1,23 @@
+<h2>Book Manager</h2>
+<button [routerLink]="['/add']">Add Book</button>
+
+<ul>
+    <h3>All Books</h3>
+    <li *ngFor="let book of pagedBooks">
+        {{ book.title }} by {{ book.author }} ( ID: {{ book.id }})
+    </li>
+</ul>
+
+<div>
+    <button (click)="prevPage()" [disabled]="currentPage === 1">Previous</button>
+    <span>Page {{ currentPage }} of {{ totalPages() }}</span>
+    <button (click)="nextPage()" [disabled]="(currentPage * pageSize) >= books.length">Next</button>
+</div>
+
+<h2>Details</h2>
+<div *ngFor="let book of books; trackBy: trackById" appHighlight>
+    <h3>{{book.title | capitalize | random }}</h3>
+    <p>{{ book.body }}</p>
+    <img [attr.loading]="'lazy'" src="https://picsum.photos/200" alt="Lazy image">
+    <a [routerLink]="['/edit', book.id]">Edit</a>
+</div>

@@ -1,0 +1,5 @@
+<form [formGroup]="form">
+    <input formControlName="title" #titleInput placeholder="Title">
+    <textarea formControlName="body" placeholder="Body"></textarea>
+    <button [disabled]="form.invalid">Save</button>
+</form>
