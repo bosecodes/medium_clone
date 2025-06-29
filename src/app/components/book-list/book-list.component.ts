@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { combineLatest, debounceTime, distinctUntilChanged, EMPTY, map, Observable, startWith, Subject, Subscription } from 'rxjs';
+import { combineLatest, debounceTime, distinctUntilChanged, map, startWith, Subject, BehaviorSubject, Observable } from 'rxjs';
 import { BookService } from 'src/app/services/book.service';
 
 @Component({
@@ -8,87 +8,84 @@ import { BookService } from 'src/app/services/book.service';
   styleUrls: ['./book-list.component.scss']
 })
 export class BookListComponent implements OnInit, OnDestroy {
-  books: any[] = [];
-
-  sub!: Subscription;
-
-  pagedBooks: any[] = [];
-
-  // implementing pagination
-  currentPage = 1;
+  // Config
   pageSize = 5;
 
-  // implementing a search filter
-  books$ = this.bookService.books$;
+  // Streams
   searchTerm$ = new Subject<string>();
-  filteredBooks$: Observable<any[]> = EMPTY;
-  searchText='';
+  currentPage$ = new BehaviorSubject<number>(1);
 
-  
-  constructor (private bookService: BookService) {}
+  // Derived streams
+  filteredBooks$!: Observable<any[]>;
+  pagedBooks$!: Observable<any[]>;
+  totalPages$!: Observable<number>;
+
+  constructor(private bookService: BookService) {}
 
   ngOnInit(): void {
-    this.sub = this.bookService.books$.subscribe(data => this.books = data);
     this.bookService.fetchBooks();
-
-    this.bookService.books$.subscribe(books => {
-      this.books = books;
-      this.updatePagedBooks();
-    });
-
+  
+    // Creates filteredBooks$ reactive stream:
     this.filteredBooks$ = combineLatest([
-      this.books$,
-      this.searchTerm$.pipe(
-        debounceTime(300),
-        distinctUntilChanged(),
-        startWith('') // show all at first
+      this.bookService.books$,   // emits full book list (mock or API)
+      this.searchTerm$.pipe(     // emits search input changes
+        startWith(''),           // ensures search starts empty → shows all books initially
+        debounceTime(300),       // avoids reacting to every keystroke instantly
+        distinctUntilChanged()   // skip unchanged search terms
       )
     ]).pipe(
       map(([books, term]) => {
-        term = term.toLowerCase();
+        const lowerTerm = term.toLowerCase();
         return books.filter(book =>
-          book.title.toLowerCase().includes(term) ||
-          book.author.toLowerCase().includes(term)
+          book.title.toLowerCase().includes(lowerTerm) ||
+          book.author.toLowerCase().includes(lowerTerm)
         );
       })
     );
+  
+    // Creates totalPages$ reactive stream:
+    this.totalPages$ = this.filteredBooks$.pipe(
+      map(filtered => Math.max(1, Math.ceil(filtered.length / this.pageSize)))
+    );
+  
+    // Creates pagedBooks$ reactive stream:
+    this.pagedBooks$ = combineLatest([
+      this.filteredBooks$,
+      this.currentPage$
+    ]).pipe(
+      map(([filtered, currentPage]) => {
+        const start = (currentPage - 1) * this.pageSize;
+        return filtered.slice(start, start + this.pageSize);
+      })
+    );
   }
+  
 
   onSearch(term: string) {
+    this.currentPage$.next(1); // reset to first page on search
     this.searchTerm$.next(term);
   }
 
-  updatePagedBooks() {
-    const start = (this.currentPage - 1) * this.pageSize;
-    const end = start + this.pageSize;
-    this.pagedBooks = this.books.slice(start, end);
-  }
-
-  nextPage() {
-    if (this.currentPage * this.pageSize < this.books.length) {
-      this.currentPage++;
-      this.updatePagedBooks();
+  nextPage(totalPages: number) {
+    const curr = this.currentPage$.value;
+    if (curr < totalPages) {
+      this.currentPage$.next(curr + 1);
     }
   }
 
   prevPage() {
-    if (this.currentPage > 1) {
-      this.currentPage--;
-      this.updatePagedBooks();
+    const curr = this.currentPage$.value;
+    if (curr > 1) {
+      this.currentPage$.next(curr - 1);
     }
   }
 
   ngOnDestroy(): void {
-    this.sub.unsubscribe();
+    this.currentPage$.complete();
+    this.searchTerm$.complete();
   }
 
-  totalPages(): number {
-    return Math.ceil(this.books.length / this.pageSize);
-  }
-  
   trackById(index: number, book: any) {
     return book.id;
   }
-
-
 }
