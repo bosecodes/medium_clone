@@ -1,1 +1,30 @@
 /* You can add global styles to this file, and also import other style files */
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+
+
+// add dark mode styles
+body.dark-mode {
+    background-color: #121212;
+    color: #eee;
+  }
+  
+  body.dark-mode .mat-card {
+    background: #1e1e1e;
+    color: #eee;
+  }
+  
+  body.dark-mode .mat-form-field-appearance-outline .mat-form-field-outline {
+    color: #aaa;
+  }
+  
+  body.dark-mode .book-item {
+    border-bottom-color: #333;
+  }
+  
+  body.dark-mode .book-item:hover {
+    background-color: #222;
+  }
+  

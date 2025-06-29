@@ -1,23 +1,39 @@
-<input 
-  type="text" 
-  placeholder="Search books" 
-  #searchBox
-  (input)="onSearch(searchBox.value)"
->
+<div class="book-list-container">
+    <div class="action-bar">
+        <button mat-raised-button color="accent" [routerLink]="['/add']">
+          <mat-icon>add</mat-icon> Add Book
+        </button>
+        <button mat-stroked-button (click)="toggleDarkMode()">
+            {{ isDarkMode ? '🌞' : '🌚' }}
+        </button>
+      </div>      
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-label>Search books</mat-label>
+      <input #searchBox matInput (input)="onSearch(searchBox.value)">
+    </mat-form-field>
 
-<ul>
-  <li *ngFor="let book of pagedBooks$ | async; trackBy: trackById">
-    <img [src]="book.imageUrl" alt="{{ book.title }}" width="100">
-    {{ book.title }} by {{ book.author }}
-  </li>
-</ul>
-
-<ng-container *ngIf="(totalPages$ | async) as totalPages">
-  <ng-container *ngIf="(currentPage$ | async) as currentPage">
-    <div>
-      <button (click)="prevPage()" [disabled]="currentPage === 1">Previous</button>
-      <span>Page {{ currentPage }} of {{ totalPages }}</span>
-      <button (click)="nextPage(totalPages)" [disabled]="currentPage === totalPages">Next</button>
-    </div>
-  </ng-container>
-</ng-container>
+    <ul class="book-list">
+        <li *ngFor="let book of pagedBooks$ | async; trackBy: trackById" class="book-item">
+          <img [src]="book.imageUrl" alt="{{ book.title }}" width="100">
+          <div class="book-info">
+            <h3>{{ book.title }}</h3>
+            <p>by {{ book.author }}</p>
+          </div>
+        </li>
+      </ul>
+  
+    <ng-container *ngIf="(totalPages$ | async) as totalPages">
+        <ng-container *ngIf="(currentPage$ | async) as currentPage">
+          <div class="pagination-controls">
+            <button mat-raised-button color="primary" (click)="prevPage()" [disabled]="currentPage === 1">
+              <mat-icon>arrow_back</mat-icon> Prev
+            </button>
+            <span>Page {{ currentPage }} of {{ totalPages }}</span>
+            <button mat-raised-button color="primary" (click)="nextPage(totalPages)" [disabled]="currentPage === totalPages">
+              Next <mat-icon>arrow_forward</mat-icon>
+            </button>
+          </div>
+        </ng-container>
+      </ng-container>      
+  </div>
+  

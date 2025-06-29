@@ -9,7 +9,7 @@ import { BookService } from 'src/app/services/book.service';
 })
 export class BookListComponent implements OnInit, OnDestroy {
   // Config
-  pageSize = 5;
+  pageSize = 3;
 
   // Streams
   searchTerm$ = new Subject<string>();
@@ -88,4 +88,18 @@ export class BookListComponent implements OnInit, OnDestroy {
   trackById(index: number, book: any) {
     return book.id;
   }
+
+  // add a dark mode toggle
+  isDarkMode = false;
+
+  toggleDarkMode() {
+    this.isDarkMode = !this.isDarkMode;
+    const body = document.body;
+    if (this.isDarkMode) {
+      body.classList.add('dark-mode');
+    } else {
+      body.classList.remove('dark-mode');
+    }
+  }
+
 }

@@ -36,7 +36,7 @@ export class BookService {
     { id: 20, title: 'Dracula', author: 'Bram Stoker' }
   ].map(book => ({
     ...book,
-    imageUrl: `https://picsum.photos/200?random=${Math.floor(Math.random() * 1000)}`
+    imageUrl: this.generateRandomImageUrl()
   }));;
   
 
@@ -73,12 +73,19 @@ export class BookService {
   addBook(book: any): Observable<any> {
     const newBook = {
       ...book,
-      id: this.generateId()
+      id: this.generateId(),
+      imageUrl: this.generateRandomImageUrl()
     };
+    
     this.mockBooks.push(newBook);
     this.booksSubject.next([...this.mockBooks]);
     return of(newBook);
   }
+
+  private generateRandomImageUrl(): string {
+    return `https://picsum.photos/600?random=${Math.floor(Math.random() * 1000)}`;
+  }
+  
   private generateId(): number {
     return this.mockBooks.length > 0
       ? Math.max(...this.mockBooks.map(b => b.id)) + 1
