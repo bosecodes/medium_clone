@@ -1,20 +1,37 @@
 <h2>Book Manager</h2>
 <button [routerLink]="['/add']">Add Book</button>
 
+<!--Search filter -->
+<br>
+<input type="text" [(ngModel)]="searchText" (ngModelChange)="onSearch($event)" placeholder="Search books">
+<ul>
+    <li *ngFor="let book of filteredBooks$ | async">
+        <img [src]="book.imageUrl" alt="{{ book.title }}" width="100">
+        <div>
+            {{ book.title }} by {{ book.author }} (ID: {{ book.id }})
+        </div>
+    </li>
+</ul>
+
 <ul>
     <h3>All Books</h3>
     <li *ngFor="let book of pagedBooks">
+        <img [src]="book.imageUrl" alt="{{ book.title }}" width="100">
+        <br>
         {{ book.title }} by {{ book.author }} ( ID: {{ book.id }})
     </li>
 </ul>
 
 <div>
+    <!--PAGINATION IMPLEMENTATION-->
     <button (click)="prevPage()" [disabled]="currentPage === 1">Previous</button>
     <span>Page {{ currentPage }} of {{ totalPages() }}</span>
     <button (click)="nextPage()" [disabled]="(currentPage * pageSize) >= books.length">Next</button>
 </div>
 
-<h2>Details</h2>
+
+<h2 style="border-top: 500px;">Details</h2>
+<!--Using trackBy, lazy loading, custom pipes, pure and impure, routerLink-->
 <div *ngFor="let book of books; trackBy: trackById" appHighlight>
     <h3>{{book.title | capitalize | random }}</h3>
     <p>{{ book.body }}</p>

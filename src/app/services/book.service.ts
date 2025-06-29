@@ -34,7 +34,10 @@ export class BookService {
     { id: 18, title: 'The Odyssey', author: 'Homer' },
     { id: 19, title: 'Frankenstein', author: 'Mary Shelley' },
     { id: 20, title: 'Dracula', author: 'Bram Stoker' }
-  ];
+  ].map(book => ({
+    ...book,
+    imageUrl: `https://picsum.photos/200?random=${Math.floor(Math.random() * 1000)}`
+  }));;
   
 
   fetchBooks(): void {
