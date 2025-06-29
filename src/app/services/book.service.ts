@@ -7,7 +7,9 @@ import { BehaviorSubject, map, Observable, of } from 'rxjs';
 })
 export class BookService {
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) { 
+    this.loadFavorites();
+  }
 
   private booksUrl = 'https://jsonplaceholder.typicode.com/posts';
   private booksSubject = new BehaviorSubject<any[]>([]);
@@ -100,4 +102,29 @@ export class BookService {
     return this.http.delete(`${this.booksUrl}/${id}`);
   }
 
+  private favoriteIds = new Set<number>();
+
+  toggleFavorite(id: number) {
+    if (this.favoriteIds.has(id)) {
+      this.favoriteIds.delete(id);
+    } else {
+      this.favoriteIds.add(id);
+    }
+    this.saveFavorites();
+  }
+  
+  isFavorite(id: number): boolean {
+    return this.favoriteIds.has(id);
+  }
+  
+  private saveFavorites() {
+    localStorage.setItem('favoriteIds', JSON.stringify(Array.from(this.favoriteIds)));
+  }
+  
+  private loadFavorites() {
+    const data = localStorage.getItem('favoriteIds');
+    if (data) {
+      this.favoriteIds = new Set<number>(JSON.parse(data));
+    }
+  }
 }

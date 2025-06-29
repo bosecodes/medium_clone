@@ -19,6 +19,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { FavoriteDirective } from './directives/favorite.directive';
 
 @NgModule({
   declarations: [
@@ -28,7 +29,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
     BookEditComponent,
     CapitalizePipe,
     RandomPipe,
-    HighlightDirective
+    HighlightDirective,
+    FavoriteDirective
   ],
   imports: [
     BrowserModule,
